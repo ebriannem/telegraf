@@ -8,7 +8,7 @@ import (
 // NumTags is the maximum number of tags that can be aggregated on.
 const NumTags int = 4
 
-//TagCounter stores the aggregated metrics and the relevant tags
+// TagCounter stores the aggregated metrics and the relevant tags
 type TagCounter struct {
 	cache  map[string]map[tagCombo]int
 	TagNames []string `toml:"tag_names"`
@@ -29,14 +29,14 @@ var sampleConfig = `
 	# tag_names = ["fdpErrorCode", "tier", "flow_category", "intuit_fdp_flowname"]
 `
 
-//SampleConfig ...
+//SampleConfig gives the sample configuration
 func (tc *TagCounter) SampleConfig() string {
 	return sampleConfig
 }
 
-//Description ...
+//Description gives the description of the tagcounter
 func (tc *TagCounter) Description() string {
-	return "Aggregates by the count of specified tag combinations."
+	return "Counts the occurences of each combination of specified tags."
 }
 
 func init() {
@@ -48,14 +48,12 @@ func init() {
 // NewTagCounter creates a new TagCounter
 func NewTagCounter() telegraf.Aggregator {
 	tc := &TagCounter{}
-	if NumTags < len(tc.TagNames) {
-		//error
-	}
 	tc.Reset()
 	return tc
 }
 
-// Add takes in a new metric and aggegates it into the current cache
+// Add takes in a new metric and increments the count of metrics received
+// with the same tags
 func (tc *TagCounter) Add(in telegraf.Metric) {
 	hid := in.Name()
 	if _, ok := tc.cache[hid]; !ok {
@@ -65,12 +63,7 @@ func (tc *TagCounter) Add(in telegraf.Metric) {
 	newtagCombo := tagCombo {
 		metricName: in.Name()}
 	tc.assignTags(&newtagCombo, in.Tags())
-
-	if _, ok := tc.cache[hid][newtagCombo]; ok {
-		tc.cache[hid][newtagCombo]++
-	} else {
-		tc.cache[hid][newtagCombo] = 1
-	}
+	tc.cache[hid][newtagCombo]++
 }
 
 func (tc *TagCounter) assignTags(tagCombo *tagCombo, tags map[string]string) {
@@ -81,7 +74,7 @@ func (tc *TagCounter) assignTags(tagCombo *tagCombo, tags map[string]string) {
 	}
 }
 
-// Push sends aggregated metrics
+// Push sends all aggregated metrics to the Accumulator
 func (tc *TagCounter) Push(acc telegraf.Accumulator) {
 	for _, tagMap := range tc.cache {
 		for agg, count := range tagMap {

@@ -3,6 +3,7 @@ package tagcounter
 import (
 	"testing"
 	"time"
+	"strings"
   "github.com/influxdata/telegraf"
 	"github.com/influxdata/telegraf/metric"
 	"github.com/influxdata/telegraf/testutil"
@@ -109,7 +110,7 @@ func TestBasic2(t *testing.T) {
 	tc := NewTestTagCounter([]string{"a", "b", "d"})
 	acc := testutil.Accumulator{}
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 10; i++ {
 		tc.Add(m1)
 		tc.Add(m2)
 		tc.Add(m3)
@@ -118,7 +119,7 @@ func TestBasic2(t *testing.T) {
 	tc.Push(&acc)
 
 	expectedFields1 := map[string]interface{}{
-		"count": 300,}
+		"count": 30,}
 
 	expectedTags1 := map[string]string{
 	 		 "a": "a_val1",
@@ -126,7 +127,7 @@ func TestBasic2(t *testing.T) {
 		 	 "d": "d_val1"}
 
 	expectedFields2 := map[string]interface{}{
- 		"count": 100,}
+ 		"count": 10,}
 
  	expectedTags2 := map[string]string{
  	 		 "a": "a_val2",
@@ -180,6 +181,7 @@ func TestMultipleTagGroups(t *testing.T) {
  	expectedTags2 := map[string]string{
  		 "a": "a_val2",
  		 "b": "b_val1"}
+
 	acc.AssertContainsTaggedFields(t, "m1", expectedFields1, expectedTags1)
 	acc.AssertContainsTaggedFields(t, "m1", expectedFields2, expectedTags2)
 }
@@ -254,4 +256,12 @@ func TestMultipleMetrics(t *testing.T) {
  		 "b": "b_val1"}
 	acc.AssertContainsTaggedFields(t, "m1", expectedFields1, expectedTags1)
 	acc.AssertContainsTaggedFields(t, "m4", expectedFields2, expectedTags2)
+}
+
+// Tests the creation of a new TagCounter and the SampleConfig
+func TestNewTagCounter(t *testing.T) {
+	tc := NewTagCounter()
+	if !strings.Contains(tc.SampleConfig(), "tag_names") {
+		t.Errorf("tag_names missing from Sample Config")
+	}
 }
