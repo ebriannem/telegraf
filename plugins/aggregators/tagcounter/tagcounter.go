@@ -6,7 +6,7 @@ import (
 )
 
 // NumTags is the maximum number of tags that can be aggregated on.
-const NumTags int = 4
+const NumTags int = 10
 
 // TagCounter stores the aggregated metrics and the relevant tags
 type TagCounter struct {
