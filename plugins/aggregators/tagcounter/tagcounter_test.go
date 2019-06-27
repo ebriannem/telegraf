@@ -152,7 +152,7 @@ func TestMissing(t *testing.T) {
 
 	expectedTags := map[string]string{
 	 		 "a": "a_val1",
-	 		 "e": "",}
+	 		 "e": "null",}
 	acc.AssertContainsTaggedFields(t, "m1", expectedFields, expectedTags)
 }
 

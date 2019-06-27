@@ -70,6 +70,8 @@ func (tc *TagCounter) assignTags(tagCombo *tagCombo, tags map[string]string) {
 	for i, tagName := range tc.TagNames {
 		if tagVal, ok := tags[tagName]; ok {
 			tagCombo.tagValues[i] = tagVal
+		} else {
+			tagCombo.tagValues[i] = "null"
 		}
 	}
 }
