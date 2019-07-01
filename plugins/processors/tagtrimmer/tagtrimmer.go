@@ -8,11 +8,11 @@ import (
 
 const sampleConfig = `
  # tag_name = "intuit_offeringid"
- # trim_values = ["mint", "qbo", "qbse", "qbf", "turbotax", "account_view",
+ # trim_values = ["mint", "qbo", "qbse", "qbf", "turbotax", "ACCOUNT_VIEW",
   "triage", "fdptools", "6", "ctg"]
 `
 
-// TagTrimmer ...
+// TagTrimmer stores the tag name and the values to be trimmed to
 type TagTrimmer struct {
 	TagName string `toml:"tag_name"`
 	TrimValues []string `toml:"trim_values"`
@@ -25,7 +25,7 @@ func (tt *TagTrimmer) SampleConfig() string {
 
 // Description ...
 func (tt *TagTrimmer) Description() string {
-	return "TagTrimmer trims tag values containing a given string down to that string."
+	return "Trims tag values containing a given string down to that string."
 }
 
 
