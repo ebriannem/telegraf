@@ -9,7 +9,8 @@ import (
 const sampleConfig = `
  # tag_name = "intuit_offeringid"
  # trim_values = ["mint", "qbo", "qbse", "qbf", "turbotax", "ACCOUNT_VIEW",
-  "triage", "fdptools", "6", "ctg"]
+  "triage", "fdptools", "6", "tax.ctg", "sbe.salsa.platform",
+	 "smallbusiness.mmo.ui", "sbg.payments.account"]
 `
 
 // TagTrimmer stores the tag name and the values to be trimmed to

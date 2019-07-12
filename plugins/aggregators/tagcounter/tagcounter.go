@@ -3,6 +3,7 @@ package tagcounter
 import (
 	"github.com/influxdata/telegraf"
 	"github.com/influxdata/telegraf/plugins/aggregators"
+	"github.com/deckarep/golang-set"
 )
 
 // NumTags is the maximum number of tags that can be aggregated on.
@@ -25,7 +26,7 @@ var sampleConfig = `
   # period = "30s"
 	## Whether the old metric should still be stored.
   # drop_original = true
-	## The tag keys to aggregate on. Note: NumTags must be set to be >= the length of this array.
+	## The tag keys to aggregate on.
 	# tag_names = ["fdpErrorCode", "tier", "flow_category", "intuit_fdp_flowname"]
 `
 
