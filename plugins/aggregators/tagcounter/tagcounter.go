@@ -3,22 +3,21 @@ package tagcounter
 import (
 	"github.com/influxdata/telegraf"
 	"github.com/influxdata/telegraf/plugins/aggregators"
-	"github.com/deckarep/golang-set"
 )
 
 // NumTags is the maximum number of tags that can be aggregated on.
-const NumTags int = 10
+const NumTags int = 20
 
 // TagCounter stores the aggregated metrics and the relevant tags
 type TagCounter struct {
-	cache  map[string]map[tagCombo]int
+	cache    map[string]map[tagCombo]int
 	TagNames []string `toml:"tag_names"`
 }
 
 // tagCombo stores the data for an aggregated metric
 type tagCombo struct {
 	metricName string
-	tagValues [NumTags]string
+	tagValues  [NumTags]string
 }
 
 var sampleConfig = `
@@ -61,7 +60,7 @@ func (tc *TagCounter) Add(in telegraf.Metric) {
 		tc.cache[hid] = make(map[tagCombo]int)
 	}
 
-	newtagCombo := tagCombo {
+	newtagCombo := tagCombo{
 		metricName: in.Name()}
 	tc.assignTags(&newtagCombo, in.Tags())
 	tc.cache[hid][newtagCombo]++
@@ -82,8 +81,8 @@ func (tc *TagCounter) Push(acc telegraf.Accumulator) {
 	for _, tagMap := range tc.cache {
 		for agg, count := range tagMap {
 
-			fields := map[string]interface{} {
-				"count" : count,
+			fields := map[string]interface{}{
+				"count": count,
 			}
 
 			newTags := make(map[string]string)
