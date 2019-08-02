@@ -160,7 +160,7 @@ def go_get(branch, update=False, no_uncommitted=False):
         logging.error("There are uncommitted changes in the current directory.")
         return False
     logging.info("Retrieving dependencies with `dep`...")
-    run("dep ensure -v -vendor-only")
+    run("dep ensure -v")
     return True
 
 def run_tests(race, parallel, timeout, no_vet):
