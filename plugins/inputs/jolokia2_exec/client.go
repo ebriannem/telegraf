@@ -91,11 +91,12 @@ type jolokiaTarget struct {
 
 type jolokiaExecResponse struct {
 	Request jolokiaExecRequest  `json:"request"`
-	Value   string    		`json:"value"` // value is the execution details
+	Value   string    		`json:"value"` // value is the execution details string
 	Status  int            		`json:"status"`
 	TimeStamp  	uint32          `json:"timestamp"` 
 }
 
+// create a new client
 func NewClient(url string, config *ClientConfig) (*Client, error) {
 	tlsConfig, err := config.ClientConfig.TLSConfig()
 	if err != nil {
@@ -119,6 +120,7 @@ func NewClient(url string, config *ClientConfig) (*Client, error) {
 	}, nil
 }
 
+// exec makes POST execute request to the Jolokia API end point to conduct corresponding operation on MBean
 func (c *Client) exec(requests []ExecRequest) ([]ExecResponse, error) {
 	jrequests := makeJolokiaExecRequests(requests, c.config.ProxyConfig)
 	requestBody, err := json.Marshal(jrequests)
@@ -158,6 +160,7 @@ func (c *Client) exec(requests []ExecRequest) ([]ExecResponse, error) {
 	return makeExecResponses(jresponses), nil
 }
 
+// makeJolokiaExecRequests creates an array of Jolokia execute requests with extra proxy configs
 func makeJolokiaExecRequests (requests []ExecRequest, proxyConfig *ProxyConfig) []jolokiaExecRequest {
     jrequests := make([]jolokiaExecRequest, 0)
 	if proxyConfig == nil {
@@ -187,6 +190,7 @@ func makeJolokiaExecRequests (requests []ExecRequest, proxyConfig *ProxyConfig) 
 	return jrequests
 }
 
+// makeJolokiaExecRequest creates a Jolokia execute request object
 func makeJolokiaExecRequest (request ExecRequest, jtarget *jolokiaTarget) jolokiaExecRequest {
 	jrequest := jolokiaExecRequest{
 		Type:   "exec",
@@ -199,6 +203,7 @@ func makeJolokiaExecRequest (request ExecRequest, jtarget *jolokiaTarget) joloki
 	return jrequest
 } 
 
+// makeExecResponses creates an array of Jolokia execute response objects
 func makeExecResponses(jresponses []jolokiaExecResponse) []ExecResponse {
 	responses := make([]ExecResponse, 0)
 
@@ -248,16 +253,16 @@ func formatUrl(configUrl, username, password string) (string, error) {
 		return "", err
 	}
 
-	readUrl := url.URL{
+	resultUrl := url.URL{
 		Host:   parsedUrl.Host,
 		Scheme: parsedUrl.Scheme,
 	}
 
 	if username != "" || password != "" {
-		readUrl.User = url.UserPassword(username, password)
+		resultUrl.User = url.UserPassword(username, password)
 	}
 
-	readUrl.Path = path.Join(parsedUrl.Path, "read")
-	readUrl.Query().Add("ignoreErrors", "true")
-	return readUrl.String(), nil
+	resultUrl.Path = path.Join(parsedUrl.Path, "exec")
+	resultUrl.Query().Add("ignoreErrors", "true")
+	return resultUrl.String(), nil
 }

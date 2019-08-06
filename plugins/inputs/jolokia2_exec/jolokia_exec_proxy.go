@@ -64,6 +64,8 @@ func (jp *JolokiaProxy) SampleConfig() string {
     mbean = "com.intuit.platform.fdp.monitoring:type=ExecutionDetailQueue"
     operation = "poll"
     arguments = []
+    repeatMetric = true
+    repeatTime = 10
 `
 }
 

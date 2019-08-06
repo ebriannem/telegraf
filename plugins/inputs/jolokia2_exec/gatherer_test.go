@@ -64,3 +64,74 @@ func TestJolokia2_makeExecRequests(t *testing.T) {
 		}
 	}
 }
+
+type TagTest struct {
+	name 	string
+	metricTags map[string]string
+	outerTags  map[string]interface{}
+	expected  map[string]string
+}
+
+func TestJolokia2_mergeTags(t *testing.T) {
+
+	cases := [] TagTest {
+	{
+		name: "case1",
+		metricTags: map[string]string{
+			"metricTag1": "val1",
+			"metricTag2": "val2",
+		}, 
+		outerTags: map[string]interface{}{
+	    	"outerTag1":"val1",
+			"outerTag2":"val2",
+			"outerTag3":"val3",
+	    },
+	    expected: map[string]string{
+	    	"metricTag1": "val1",
+	    	"metricTag2": "val2",
+	    	"outerTag1":"val1",
+			"outerTag2":"val2",
+			"outerTag3":"val3",
+	    },
+	},
+	{
+		name: "case2_empty_metrictags",
+		metricTags: map[string]string{}, 
+		outerTags: map[string]interface{}{
+	    	"outerTag1":"val1",
+			"outerTag2":"val2",
+			"outerTag3":"val3",
+	    },
+	    expected: map[string]string{
+	    	"outerTag1":"val1",
+			"outerTag2":"val2",
+			"outerTag3":"val3",
+	    },
+	},
+	{
+		name: "case3_empty_outertags",
+		metricTags: map[string]string{
+			"metricTag1": "val1",
+			"metricTag2": "val2",
+			"metricTag3": "val3",
+		}, 
+		outerTags: map[string]interface{}{},
+	    expected: map[string]string{
+	    	"metricTag1": "val1",
+			"metricTag2": "val2",
+			"metricTag3": "val3",
+	    },
+	},
+	{
+		name: "case4_empty",
+		metricTags: map[string]string{}, 
+		outerTags: map[string]interface{}{},
+	    expected: map[string]string{},
+	},
+}
+
+	for _, c := range cases {
+		result := mergeTags(c.metricTags, c.outerTags)
+		assert.Equal(t, result, c.expected, "Failing case: " + c.name)
+	}
+}

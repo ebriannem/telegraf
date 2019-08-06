@@ -16,6 +16,8 @@ type MetricConfig struct {
 
 	Operation		string
 	Arguments		[]string
+	RepeatMetric    bool
+	RepeatTime      int
 }
 
 // A Metric represents a specification for a
@@ -36,6 +38,8 @@ type Metric struct {
 
 	Operation		string
 	Arguments		[]string
+	RepeatMetric    bool
+	RepeatTime      int
 }
 
 func NewMetric(config MetricConfig, defaultFieldPrefix, defaultFieldSeparator, defaultTagPrefix string) Metric {
@@ -46,6 +50,8 @@ func NewMetric(config MetricConfig, defaultFieldPrefix, defaultFieldSeparator, d
 		TagKeys: config.TagKeys,
 		Operation:	config.Operation,
 		Arguments:	config.Arguments,
+		RepeatMetric:    config.RepeatMetric,
+	    RepeatTime:      config.RepeatTime,
 	}
 
 	if config.FieldName != nil {

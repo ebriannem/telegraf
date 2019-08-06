@@ -38,11 +38,10 @@ func (g *Gatherer) Gather(client *Client, acc telegraf.Accumulator) error {
 		return err
 	}
 
+	// TODO: generalize the use case. This is just for our specific execution details mBean
     for _, response := range responses {
 
     	val := strings.Replace(response.Value, "\\", "", -1) 
-        // DEBUG
-        // fmt.Printf("%v", val)
     	executionDetails := make(map[string]interface{})
 
     	if err = json.Unmarshal([]byte(val), &executionDetails); err != nil {
@@ -76,19 +75,37 @@ func mergeTags(metricTags map[string]string, outerTags map[string]interface{}) m
 func makeExecRequests(metrics []Metric) []ExecRequest {
 	var requests []ExecRequest
 	for _, metric := range metrics {
-		execRequest := ExecRequest{
-			Mbean:      metric.Mbean,
-			Operation:	metric.Operation,
-			Arguments:  []string{},
-		}
+		if metric.RepeatMetric == true {
+			for i := 0; i < metric.RepeatTime; i += 1 {
+				execRequest := ExecRequest{
+					Mbean:      metric.Mbean,
+					Operation:	metric.Operation,
+					Arguments:  []string{},
+				}
 
-		args := metric.Arguments
-		if args != nil {
-			for _, arg := range args {
-				execRequest.Arguments = append(execRequest.Arguments, arg)
+				args := metric.Arguments
+				if args != nil {
+					for _, arg := range args {
+						execRequest.Arguments = append(execRequest.Arguments, arg)
+					}
+				}
+				requests = append(requests, execRequest)
 			}
+		} else {
+			execRequest := ExecRequest{
+				Mbean:      metric.Mbean,
+				Operation:	metric.Operation,
+				Arguments:  []string{},
+			}
+
+			args := metric.Arguments
+			if args != nil {
+				for _, arg := range args {
+					execRequest.Arguments = append(execRequest.Arguments, arg)
+				}
+			}
+			requests = append(requests, execRequest)
 		}
-		requests = append(requests, execRequest)
 	}
 
 	return requests
