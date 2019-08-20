@@ -4,6 +4,7 @@ import (
 	_ "github.com/influxdata/telegraf/plugins/processors/converter"
 	_ "github.com/influxdata/telegraf/plugins/processors/date"
 	_ "github.com/influxdata/telegraf/plugins/processors/enum"
+	_ "github.com/influxdata/telegraf/plugins/processors/maptagger"
 	_ "github.com/influxdata/telegraf/plugins/processors/override"
 	_ "github.com/influxdata/telegraf/plugins/processors/parser"
 	_ "github.com/influxdata/telegraf/plugins/processors/pivot"
