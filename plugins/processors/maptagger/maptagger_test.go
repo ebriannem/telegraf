@@ -22,12 +22,11 @@ func newMetric(name string, tags map[string]string, fields map[string]interface{
 
 func TestExact(t *testing.T) {
 	mt := NewMapTagger()
-	mt.Tags = []conversion{
+	mt.conversions = []conversion{
 		conversion{
 			OldKey:  "name1",
 			NewKey:  "name2",
 			Mapping: map[string]string{"a": "b", "c": "d"},
-			Exact:   true,
 		},
 	}
 	m1 := newMetric("foo1", map[string]string{"name1": "a"}, nil)
@@ -47,24 +46,21 @@ func TestExact(t *testing.T) {
 
 func TestMultiple(t *testing.T) {
 	mt := NewMapTagger()
-	mt.Tags = []conversion{
+	mt.conversions = []conversion{
 		conversion{
 			OldKey:  "name1a",
 			NewKey:  "name1b",
 			Mapping: map[string]string{"a": "b", "c": "d"},
-			Exact:   true,
 		},
 		conversion{
 			OldKey:  "name2a",
 			NewKey:  "name2b",
 			Mapping: map[string]string{"a": "b", "e": "f"},
-			Exact:   true,
 		},
 		conversion{
 			OldKey:  "name3a",
 			NewKey:  "name3b",
 			Mapping: map[string]string{"1": "2", "3": "4"},
-			Exact:   true,
 		},
 	}
 	m1 := newMetric("foo1", map[string]string{"name1a": "a", "name2a": "a"}, nil)
@@ -87,12 +83,12 @@ func TestMultiple(t *testing.T) {
 
 func TestInexact(t *testing.T) {
 	mt := NewMapTagger()
-	mt.Tags = []conversion{
+	mt.conversions = []conversion{
 		conversion{
-			OldKey:  "name1",
-			NewKey:  "name2",
-			Mapping: map[string]string{"a": "b"},
-			Exact:   false,
+			OldKey:   "name1",
+			NewKey:   "name2",
+			Mapping:  map[string]string{"a": "b"},
+			Contains: true,
 		},
 	}
 	m1 := newMetric("foo1", map[string]string{"name1": "abc"}, nil)
@@ -108,4 +104,23 @@ func TestInexact(t *testing.T) {
 	assert.Equal(t, m12.Tags(), results[0].Tags())
 	assert.Equal(t, m22.Tags(), results[1].Tags())
 	assert.Equal(t, m32.Tags(), results[2].Tags())
+}
+
+func TestDefault(t *testing.T) {
+	mt := NewMapTagger()
+	mt.conversions = []conversion{
+		conversion{
+			OldKey:  "name1",
+			NewKey:  "name2",
+			Mapping: map[string]string{"a": "b", "c": "d"},
+			Default: "customDefault",
+		},
+	}
+	m1 := newMetric("foo2", map[string]string{"name1": "abc"}, nil)
+
+	results := mt.Apply(m1)
+
+	m12 := newMetric("foo2", map[string]string{"name1": "abc", "name2": "customDefault"}, nil)
+
+	assert.Equal(t, m12.Tags(), results[0].Tags())
 }

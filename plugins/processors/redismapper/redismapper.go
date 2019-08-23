@@ -22,6 +22,7 @@ type conversion struct {
 	Contains     bool
 	HandleQuotes bool
 	CacheName    string
+	Default      string
 }
 
 const sampleConfig = `
@@ -66,7 +67,10 @@ func (rm *RedisMapper) Description() string {
 func (rm *RedisMapper) Apply(in ...telegraf.Metric) []telegraf.Metric {
 	for _, metric := range in {
 		for _, tagConversion := range rm.Conversions {
-			newValue := "Unknown"
+			newValue := tagConversion.Default
+			if len(newValue) == 0 {
+				newValue = "Unknown"
+			}
 			if oldValue, ok := metric.GetTag(tagConversion.OldKey); ok {
 				if tagConversion.HandleQuotes {
 					oldValue = addQuotes(oldValue)

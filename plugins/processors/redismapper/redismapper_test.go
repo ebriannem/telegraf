@@ -189,3 +189,36 @@ func TestOrder(t *testing.T) {
 
 	assert.Equal(t, m12.Tags(), results[0].Tags())
 }
+
+func TestDefault(t *testing.T) {
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+	client.HMSet("TestMapDefault", map[string]interface{}{})
+
+	rm := NewRedisMapper()
+	rm.client = client
+	rm.Conversions = []conversion{
+		conversion{
+			OldKey:    "nameA1",
+			NewKey:    "nameA2",
+			CacheName: "TestMapDefault",
+		},
+		conversion{
+			OldKey:    "nameB1",
+			NewKey:    "nameB2",
+			CacheName: "TestMapDefault",
+			Default:   "customDefault",
+		},
+	}
+	m1 := newMetric("foo1", map[string]string{"nameA1": "a", "nameB1": "c"}, nil)
+
+	results := rm.Apply(m1)
+
+	m1b := newMetric("foo1", map[string]string{"nameA1": "a", "nameB1": "c",
+		"nameA2": "Unknown", "nameB2": "customDefault"}, nil)
+
+	assert.Equal(t, m1b.Tags(), results[0].Tags())
+}
